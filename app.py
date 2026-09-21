@@ -11,7 +11,9 @@ VALID_KEYS = ["SAHWIRA100", "SAHWIRA200", "4BOYZ1877", "MJXADMIN2026", "TEST1234
 def check_key():
     st.sidebar.title("🔒 Activate App")
     key = st.sidebar.text_input("Enter your License Key", type="password")
-        key = st.sidebar.text_input("Enter your License Key").strip().upper().replace(",", "").replace(".", "")
+      key = st.sidebar.text_input("Enter your License Key")
+      key = key.strip().upper().replace(",", "").replace(".", "")
+
         if key in VALID_KEYS:
             st.session_state["activated"] = True
             st.sidebar.success("Activated! Welcome to Sahwira")

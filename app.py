@@ -7,20 +7,20 @@ from fpdf import FPDF
 st.set_page_config(page_title="Sahwira Sugar Guide", page_icon="💙", layout="wide")
 
 # ================== LICENSE KEY SYSTEM ==================]
-VALID_KEYS = ["SAHWIRA100", "SAHWIRA200", "4BOYZ1877", "MJXADMIN2026", "TEST1234"]
-def check_key():
-    st.sidebar.title("🔒 Activate App")
-    key = st.sidebar.text_input("Enter your License Key", type="password")
-    
-    key = key.strip().upper().replace(",", "").replace(".", "")
+VALIDVALID_KEYS = ["SAHWIRA100", "SAHWIRA200", "4BOYZ1877", "MJXADMIN2026", "TEST1234"]
 
-        if key in VALID_KEYS:
-            st.session_state["activated"] = True
-            st.sidebar.success("Activated! Welcome to Sahwira")
-            st.experimental_rerun()
-        else:
-            st.sidebar.error("Invalid Key. Pay via EcoCash 0771477408 to get a key")
-    return st.session_state.get("activated", False)
+def check_key():
+    st.sidebar.title("Activate App")
+    key = st.sidebar.text_input("Enter your License Key", type="password")
+    key = key.strip().upper().replace(",", "").replace(".", "").replace("-", "")
+    if key in VALID_KEYS:
+        st.sidebar.success("✅ Activated")
+        return True
+    else:
+        if key:
+            st.sidebar.error("❌ Invalid Key")
+        st.sidebar.info("Enter a valid license key to use the app.")
+        return False
 
 # ================== MAIN APP ==================
 if check_key():

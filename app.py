@@ -7,7 +7,7 @@ from fpdf import FPDF
 st.set_page_config(page_title="Sahwira Sugar Guide", page_icon="💙", layout="wide")
 
 # ================== LICENSE KEY SYSTEM ==================]
-VALIDVALID_KEYS = ["SAHWIRA100", "SAHWIRA200", "4BOYZ1877", "MJXADMIN2026", "TEST1234"]
+VALID_KEYS = ["SAHWIRA100", "SAHWIRA200", "4BOYZ1877", "MJXADMIN2026", "TEST1234"]
 
 def check_key():
     st.sidebar.title("Activate App")

@@ -6,7 +6,7 @@ from fpdf import FPDF
 
 st.set_page_config(page_title="Sahwira Sugar Guide", page_icon="💙", layout="wide")
 
-# ================== LICENSE KEY SYSTEM ==================]
+# =============== LICENSE KEY SYSTEM ===============
 VALID_KEYS = ["SAHWIRA100", "SAHWIRA200", "4BOYZ1877", "MJXADMIN2026", "TEST1234"]
 
 def check_key():
@@ -14,15 +14,15 @@ def check_key():
     key = st.sidebar.text_input("Enter your License Key", type="password")
     key = key.strip().upper().replace(",", "").replace(".", "").replace("-", "")
     if key in VALID_KEYS:
-        st.sidebar.success("✅ Activated")
+        st.sidebar.success("Activated")
         return True
     else:
         if key:
-            st.sidebar.error("❌ Invalid Key")
+            st.sidebar.error("Invalid Key")
         st.sidebar.info("Enter a valid license key to use the app.")
         return False
 
-# ================== MAIN APP ==================
+# =============== MAIN APP ===============
 if check_key():
     st.title("💙 Sahwira Sugar Guide")
     st.subheader("Take Control of Your Sugar. Together.")

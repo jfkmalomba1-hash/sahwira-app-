@@ -155,10 +155,14 @@ else:
             <div style='font-size:12px; line-height:1.6;'>
             <b>How to get access:</b><br>
             💳 EcoCash / ZiG / InnBucks to: <b>0771477408</b> (James)<br>
-            💲 <b>$5</b> - 3 months | <b>$15</b> - 12 months<br>
-            📲 WhatsApp proof to same number - instant activation
+                        st.markdown("""
+            <div style='font-size:12px; line-height:1.6;'>
+            <b>How to get access:</b><br>
+            EcoCash to: <b>0771477408</b> (John)<br>
+            Price: 5 USD for 3 months | 15 USD for 12 months<br>
+            WhatsApp proof - instant activation
             </div>
             """, unsafe_allow_html=True)
-            st.link_button("💬 Chat with Support on WhatsApp", "https://wa.me/263771477408?text=Hello%20Sahwira%20I%20need%20premium%20license%20for%20Sugar%20App", use_container_width=True)
+            st.link_button("WhatsApp Support", "https://wa.me/263771477408", use_container_width=True)
         
-        st.markdown("<div style='text-align:center; margin-top:18px; font-size:11px; color:#888;'>🔒 Bank-grade encryption • 🇿🇼 Built for Zimbabwe • 🚨 Emergencies: Dial 994<br>This app does not replace professional medical advice.</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:center; margin-top:18px; font-size:11px; color:#888;'>Secure | Built for Zimbabwe | Emergencies: Dial 994</div>", unsafe_allow_html=True)

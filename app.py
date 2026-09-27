@@ -154,11 +154,11 @@ else:
             st.markdown("""
             <div style='font-size:12px; line-height:1.6;'>
             <b>How to get access:</b><br>
-            💳 EcoCash / ZiG / InnBucks to: <b>0771477408</b> (James)<br>
+            💳 EcoCash / ZiG / InnBucks to: <b>771477408</b> (James)<br>
             st.markdown("""
             <div style='font-size:12px; line-height:1.6;'>
             <b>How to get access:</b><br>
-            EcoCash to: <b>0771477408</b> (John)<br>
+            EcoCash to: <b>771477408</b> (James)<br>
             Price: 5 USD for 3 months | 15 USD for 12 months<br>
             WhatsApp proof - instant activation
             </div>

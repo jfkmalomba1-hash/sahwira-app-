@@ -142,27 +142,7 @@ else:
             st.markdown("**🔑 License Key**")
             st.caption("Check your EcoCash SMS or WhatsApp from Sahwira")
             lic = st.text_input("License", placeholder="SAHWIRA100", label_visibility="collapsed", key="license_input")
-            if st.button("ACTIVATE SECURELY →", type="primary", use_container_width=True):
-                if lic.strip().upper() in VALID_KEYS:
-                    st.session_state["activated"] = True
-                    st.balloons()
-                    st.success("Welcome to Sahwira Premium!")
-                    st.rerun()
-                else:
-                    st.error("Invalid key. WhatsApp us for help.")
-            st.divider()
-            st.markdown("""
-            <div style='font-size:12px; line-height:1.6;'>
-            <b>How to get access:</b><br>
-            💳 EcoCash / ZiG / InnBucks to: <b>771477408</b> (James)<br>
-            st.markdown("""
-            <div style='font-size:12px; line-height:1.6;'>
-            <b>How to get access:</b><br>
-            EcoCash to: <b>771477408</b> (James)<br>
-            Price: 5 USD for 3 months | 15 USD for 12 months<br>
-            WhatsApp proof - instant activation
-            </div>
-            """, unsafe_allow_html=True)
+                        st.info("EcoCash to: 771477408 - John - 5 USD = 3 months | 15 USD = 12 months")
             st.link_button("WhatsApp Support", "https://wa.me/263771477408", use_container_width=True)
         
-        st.markdown("<div style='text-align:center; margin-top:18px; font-size:11px; color:#888;'>Secure | Built for Zimbabwe | Emergencies: Dial 994</div>", unsafe_allow_html=True)
+        st.caption("Secure | Built for Zimbabwe | Emergencies: Dial 994")

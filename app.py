@@ -70,29 +70,24 @@ from fpdf import FPDF
 VALID_KEYS = ["SAHWIRA100", "SAHWIRA200", "4BOYZ1877", "MJXADMIN2026", "TEST1234"]
 
 def check_key():
-    st.sidebar.title("Activate App")
-    key = st.sidebar.text_input("Enter your License Key", type="password")
-    key = key.strip().upper().replace(",", "").replace(".", "").replace("-", "")
-    if key in VALID_KEYS:
-        st.sidebar.success("Activated")
+    # check if already activated in session
+    if "activated" in st.session_state and st.session_state["activated"]:
         return True
-    else:
-        if key:
-            st.sidebar.error("Invalid Key")
-        st.sidebar.info("Enter a valid license key to use the app.")
-        return False
+    
+    key_input = st.session_state.get("license_input", "").strip().upper().replace(" ", "")
+    if key_input in VALID_KEYS:
+        st.session_state["activated"] = True
+        return True
+    return False
 
-# =============== MAIN APP ===============
+# ============= MAIN APP =============
 if check_key():
     st.title("💙 Sahwira Sugar Guide")
-    st.subheader("Take Control of Your Sugar. Together.")
-    st.caption("Made for Zimbabwe. Track. Learn. Live Well.")
+    st.subheader("Take Control of Your Health")
+    st.caption("Made for Zimbabwe. Trusted by Clinics.")
     
     st.sidebar.header("Menu")
-    page = st.sidebar.radio("Go to", ["Home", "Blood Sugar Tracker", "Meal Log", "Reports", "Tips"])
-
-    if page == "Home":
-        st.header("Welcome to Sahwira 👋")
+    page = st.sidebar.radio("Go to", ["Home", "Blood Sugar Tracker", "Reports", "Settings"])       st.header("Welcome to Sahwira 👋")
         st.write("This app helps you track your blood sugar and meals daily.")
         col1, col2 = st.columns(2)
         with col1:

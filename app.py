@@ -1,3 +1,23 @@
+import streamlit as st
+import pandas as pd
+import datetime
+import matplotlib.pyplot as plt
+from fpdf import FPDF
+
+# =============== LICENSE KEY SYSTEM ===============
+VALID_KEYS = ["SAHWIRA100", "SAHWIRA200", "4BOYZ1877", "MJXADMIN2026", "TEST1234"]
+
+def check_key():
+    # check if already activated in session
+    if "activated" in st.session_state and st.session_state["activated"]:
+        return True
+    
+    key_input = st.session_state.get("license_input", "").strip().upper().replace(" ", "")
+    if key_input in VALID_KEYS:
+        st.session_state["activated"] = True
+        return True
+    return False
+    
 # --- 1. PROFESSIONAL PAGE CONFIG ---
 st.set_page_config(
     page_title="Sahwira Health | Secure Clinic System",
@@ -56,26 +76,6 @@ st.markdown("""
 <div style='text-align:center; color:#888; font-size:11px; line-height:1.5;'>
     <b>Need help?</b> WhatsApp Support: <a href='https://wa.me/263771477408' style='color:#0D47A1; font-weight:600;'>0771477408</a><br
 
-import streamlit as st
-import pandas as pd
-import datetime
-import matplotlib.pyplot as plt
-from fpdf import FPDF
-
-# =============== LICENSE KEY SYSTEM ===============
-VALID_KEYS = ["SAHWIRA100", "SAHWIRA200", "4BOYZ1877", "MJXADMIN2026", "TEST1234"]
-
-def check_key():
-    # check if already activated in session
-    if "activated" in st.session_state and st.session_state["activated"]:
-        return True
-    
-    key_input = st.session_state.get("license_input", "").strip().upper().replace(" ", "")
-    if key_input in VALID_KEYS:
-        st.session_state["activated"] = True
-        return True
-    return False
-
 # ============= MAIN APP =============
 if check_key():
     st.title("💙 Sahwira Sugar Guide")
@@ -118,7 +118,7 @@ if check_key():
     
     data = pd.DataFrame({
         'Day': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-        'Sugar': [6.5, 7.2, 6.0, 7.8, 6.9],
+        'Sugar': [6.5, 7.2, 60, 7.8, 6.9],
     })
     
     fig, ax = plt.subplots()

@@ -1,3 +1,65 @@
+# --- 1. PROFESSIONAL PAGE CONFIG ---
+st.set_page_config(
+    page_title="Sahwira Health | Secure Clinic System",
+    page_icon="🛡️",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# --- 2. HIDE STREAMLIT BRANDING = INSTANT PROFESSIONALISM ---
+st.markdown("""
+<style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .stDeployButton {display:none;}
+    /* Medical Blue Theme */
+    .main {background-color: #F6F8FC;}
+    .trust-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: white; border: 1px solid #E3E8F0;
+        padding: 6px 12px; border-radius: 20px;
+        font-size: 11px; font-weight: 600; color: #0D47A1;
+        margin-right: 8px;
+    }
+    .clinic-card {
+        background: white; padding: 22px; border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+        border: 1px solid #EEF2F7;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# --- 3. TRUST HEADER WITH LOGO ---
+col_logo, col_title = st.columns([1, 5])
+with col_logo:
+    st.image("https://i.imgur.com/8Km9tLL.png", width=70) # Replace with your logo URL or local file
+with col_title:
+    st.markdown("""
+    ### SAHWIRA HEALTH
+    <span style='color:grey; font-size:12px;'>Harare • Secure • Private • Clinic Grade</span>
+    """, unsafe_allow_html=True)
+    st.markdown("""
+    <span class='trust-badge'>🔒 End-to-End Encrypted</span>
+    <span class='trust-badge'>✅ Data Protection Compliant</span>
+    <span class='trust-badge'>🇿🇼 Made for Zimbabwe</span>
+    """, unsafe_allow_html=True)
+
+st.divider()
+
+# --- 4. YOUR EXISTING APP CODE STARTS HERE ---
+# ... keep all your Sahwira logic below this ...
+
+# --- 5. PROFESSIONAL FOOTER - ADD AT VERY BOTTOM OF APP.PY ---
+st.markdown("---")
+st.markdown("""
+<div style='text-align:center; color:#888; font-size:11px; line-height:1.5;'>
+    <b>Need help?</b> WhatsApp Support: <a href='https://wa.me/263771477408' style='color:#0D47A1; font-weight:600;'>0771477408</a><br>
+    Sahwira Health respects your privacy. Your health data is encrypted, stored securely, and never shared. This app does not replace professional medical advice. For emergencies, dial 994.<br>
+    © 2026 Sahwira Health • Harare, Zimbabwe
+</div>
+""", unsafe_allow_html=True)
+
 import streamlit as st
 import pandas as pd
 import datetime

@@ -4,8 +4,6 @@ import datetime
 import matplotlib.pyplot as plt
 from fpdf import FPDF
 
-st.set_page_config(page_title="Sahwira Sugar Guide", page_icon="💙", layout="wide")
-
 # =============== LICENSE KEY SYSTEM ===============
 VALID_KEYS = ["SAHWIRA100", "SAHWIRA200", "4BOYZ1877", "MJXADMIN2026", "TEST1234"]
 
@@ -84,10 +82,45 @@ if check_key():
         st.write("4. **Eat Veggies First**: Helps slow sugar spikes")
         st.warning("If sugar >15 or <4, contact your clinic immediately")
 
-else:
-    st.title("💙 Sahwira Sugar Guide")
-    st.warning("🔒 Please enter your license key in the sidebar to activate")
-    st.write("### How to Buy:")
-    st.write("1. EcoCash to: **0771477408**")
-    st.write("2. Amount: **$5 for 3 months**")
-    st.write("3. WhatsApp me your number and I’ll send your key")
+    # PROFESSIONAL ACTIVATION SCREEN - CLINIC GRADE
+    st.markdown("""
+    <div class='clinic-card' style='max-width:500px; margin:auto; text-align:center;'>
+        <div style='font-size:48px;'>🛡️</div>
+        <h2 style='color:#0D47A1; margin:10px 0;'>Activate Premium Access</h2>
+        <p style='color:#666; font-size:13px;'>Your health data is encrypted and secure. Enter your clinic-provided license to unlock full reports, trends, and PDF export.</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.write("")
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        with st.container(border=True):
+            st.markdown("**🔑 License Key**")
+            st.caption("Found on your receipt or WhatsApp from Sahwira Health")
+            lic = st.text_input("License Key", placeholder="e.g. SAHWIRA100", label_visibility="collapsed")
+            
+            if st.button("ACTIVATE NOW", type="primary", use_container_width=True):
+                if check_key(lic):
+                    st.success("✅ Activated! Welcome to Sahwira Premium")
+                    st.rerun()
+                else:
+                    st.error("Invalid license. Please check or contact support.")
+            
+            st.divider()
+            st.markdown("""
+            <div style='font-size:12px;'>
+                <b>How to get a license?</b><br>
+                1. EcoCash / ZiG to: <b>0771477408</b> (John)<br>
+                2. Amount: <b>$5 for 3 months</b> / $15 per year<br>
+                3. WhatsApp proof to same number for instant activation
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.link_button("💬 WhatsApp Support: 0771477408", "https://wa.me/263771477408?text=Hello%20Sahwira%20I%20need%20license", use_container_width=True)
+        
+        st.markdown("""
+        <div style='text-align:center; color:#888; font-size:11px; margin-top:16px;'>
+        🔒 SSL Secure • ✅ POPIA Compliant • 🇿🇼 Made for Zimbabwe<br>
+        For emergencies dial 994. This app does not replace doctor advice.
+        </div>
+        """, unsafe_allow_html=True)

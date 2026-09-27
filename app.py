@@ -33,7 +33,7 @@ st.markdown("""
 # --- 3. TRUST HEADER WITH LOGO ---
 col_logo, col_title = st.columns([1, 5])
 with col_logo:
-    st.image("https://i.imgur.com/8Km9tLL.png", width=70) # Replace with your logo URL or local file
+    st.markdown("<div style='font-size:40px;'>🛡️</div>", unsafe_allow_html=True)
 with col_title:
     st.markdown("""
     ### SAHWIRA HEALTH

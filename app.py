@@ -155,7 +155,7 @@ else:
             <div style='font-size:12px; line-height:1.6;'>
             <b>How to get access:</b><br>
             💳 EcoCash / ZiG / InnBucks to: <b>0771477408</b> (James)<br>
-                        st.markdown("""
+            st.markdown("""
             <div style='font-size:12px; line-height:1.6;'>
             <b>How to get access:</b><br>
             EcoCash to: <b>0771477408</b> (John)<br>

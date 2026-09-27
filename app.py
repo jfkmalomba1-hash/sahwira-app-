@@ -142,7 +142,7 @@ else:
             st.markdown("**🔑 License Key**")
             st.caption("Check your EcoCash SMS or WhatsApp from Sahwira")
             lic = st.text_input("License", placeholder="SAHWIRA100", label_visibility="collapsed", key="license_input")
-                        st.info("EcoCash to: 771477408 - John - 5 USD = 3 months | 15 USD = 12 months")
+            st.info("EcoCash to: 771477408 - John - 5 USD = 3 months | 15 USD = 12 months")
             st.link_button("WhatsApp Support", "https://wa.me/263771477408", use_container_width=True)
         
         st.caption("Secure | Built for Zimbabwe | Emergencies: Dial 994")

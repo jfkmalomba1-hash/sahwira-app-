@@ -182,32 +182,33 @@ if check_key():
         st.warning("If sugar >15 or <4, contact your clinic immediately")
 
     # PROFESSIONAL ACTIVATION SCREEN - CLINIC GRADE
+else:
     st.markdown("""
-    <div class='clinic-card' style='max-width:500px; margin:auto; text-align:center;'>
-        <div style='font-size:48px;'>🛡️</div>
-        <h2 style='color:#0D47A1; margin:10px 0;'>Activate Premium Access</h2>
-        <p style='color:#666; font-size:13px;'>Your health data is encrypted and secure. Enter your clinic-provided license to unlock full reports, trends, and PDF export.</p>
+    <div class='clinic-card' style='max-width:520px; margin:40px auto; text-align:center;'>
+        <div style='font-size:56px;'>🛡️</div>
+        <h2 style='color:#0D47A1;'>Activate Premium Access</h2>
+        <p style='color:#666; font-size:13px;'>Your health data is encrypted. Enter your clinic-provided license to unlock reports, trends, and PDF export.</p>
     </div>
     """, unsafe_allow_html=True)
     
-    st.write("")
-    col1, col2, col3 = st.columns([1,2,1])
-    with col2:
+    c1,c2,c3 = st.columns([1,2,1])
+    with c2:
         with st.container(border=True):
             st.markdown("**🔑 License Key**")
-            st.caption("Found on your receipt or WhatsApp from Sahwira Health")
-            lic = st.text_input("License Key", placeholder="e.g. SAHWIRA100", label_visibility="collapsed")
+            st.caption("EcoCash receipt or WhatsApp from Sahwira")
+            lic = st.text_input("License", placeholder="e.g. SAHWIRA100", label_visibility="collapsed", key="license_input")
             
             if st.button("ACTIVATE NOW", type="primary", use_container_width=True):
-                if check_key(lic):
-                    st.success("✅ Activated! Welcome to Sahwira Premium")
+                if lic.strip().upper() in VALID_KEYS:
+                    st.session_state["activated"] = True
+                    st.success("✅ Activated! Welcome")
                     st.rerun()
                 else:
-                    st.error("Invalid license. Please check or contact support.")
+                    st.error("Invalid license")
             
             st.divider()
-            st.markdown("""
-            <div style='font-size:12px;'>
+            st.markdown("1. EcoCash / ZiG to: **0771477408**\n2. Amount: **$5 for 3 months**\n3. WhatsApp proof for instant key")
+            st.link_button("💬 WhatsApp: 0771477408", "https://wa.me/263771477408?text=Hello%20Sahwira%20I%20need%20license", use_container_width=True)       <div style='font-size:12px;'>
                 <b>How to get a license?</b><br>
                 1. EcoCash / ZiG to: <b>0771477408</b> (John)<br>
                 2. Amount: <b>$5 for 3 months</b> / $15 per year<br>

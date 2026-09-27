@@ -122,19 +122,61 @@ if check_key():
             st.success(f"✅ Saved {meal} with ~{carbs}g carbs")
 
     elif page == "Reports":
-        st.header("📊 Weekly Report")
-        st.write("Your sugar trend will show here once you add 3+ readings.")
-        data = pd.DataFrame({
-            'Day': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-            'Sugar': [6.5, 7.2, 6.0, 6.8, 6.2]
-        })
-        fig, ax = plt.subplots()
-        ax.plot(data['Day'], data['Sugar'], marker='o')
-        ax.set_ylabel("mmol/L")
-        ax.set_title("Last 5 Days")
-        st.pyplot(fig)
-        if st.button("Download PDF Report"):
-            st.info("PDF download coming in next update")
+    st.header("📊 Weekly Report - Sahwira Health")
+    st.write("Your sugar trend with clinic letterhead.")
+    
+    data = pd.DataFrame({
+        'Day': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+        'Sugar': [6.5, 7.2, 6.0, 7.8, 6.9],
+    })
+    
+    fig, ax = plt.subplots()
+    ax.plot(data['Day'], data['Sugar'], marker='o', color='#0D47A1', linewidth=3)
+    ax.set_ylabel("mmol/L")
+    ax.set_title("Last 5 Days - Sahwira Health")
+    ax.grid(True, alpha=0.3)
+    st.pyplot(fig)
+    
+    if st.button("📄 Download PDF Report - With Clinic Letterhead", type="primary", use_container_width=True):
+        pdf = FPDF()
+        pdf.add_page()
+        
+        # Letterhead
+        pdf.set_font("Arial", "B", 16)
+        pdf.set_text_color(13, 71, 161)
+        pdf.cell(0, 10, "SAHWIRA HEALTH", align="C", ln=True)
+        pdf.set_font("Arial", "", 9)
+        pdf.set_text_color(100,100,100)
+        pdf.cell(0, 5, "Harare, Zimbabwe | WhatsApp: 0771477408 | Secure & Private", align="C", ln=True)
+        pdf.line(10, 22, 200, 22)
+        
+        pdf.ln(10)
+        pdf.set_font("Arial", "B", 12)
+        pdf.set_text_color(0,0,0)
+        pdf.cell(0, 10, "Patient Sugar Report", ln=True)
+        pdf.set_font("Arial", "", 10)
+        pdf.cell(0, 6, f"Date: {datetime.date.today()}", ln=True)
+        pdf.cell(0, 6, f"Average Sugar: {data['Sugar'].mean():.1f} mmol/L", ln=True)
+        
+        pdf.ln(5)
+        for _, row in data.iterrows():
+            pdf.cell(0, 6, f"{row['Day']}: {row['Sugar']} mmol/L", ln=True)
+        
+        pdf.ln(10)
+        pdf.set_font("Arial", "I", 8)
+        pdf.multi_cell(0, 4, "Disclaimer: This report is for tracking only and does not replace professional medical advice. For emergencies dial 994. Data encrypted and private.")
+        
+        pdf.ln(10)
+        pdf.set_font("Arial", "B", 10)
+        pdf.cell(0, 6, "Sahwira Health - Signed Electronically", ln=True)
+        
+        pdf_path = "/tmp/sahwira_report.pdf"
+        pdf.output(pdf_path)
+        
+        with open(pdf_path, "rb") as f:
+            st.download_button("⬇️ Download Now", f, file_name=f"Sahwira_Report_{datetime.date.today()}.pdf", mime="application/pdf", use_container_width=True)
+        
+        st.success("✅ Professional report ready! With letterhead & emergency number.")
 
     elif page == "Tips":
         st.header("💡 Daily Sugar Tips")

@@ -26,7 +26,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. HIDE STREAMLIT BRANDING = INSTANT PROFESSIONALISM ---
+# --- 2. HIDE STREAMLIT BRANDING = INSTANT TRUST ---
 st.markdown("""
 <style>
     #MainMenu {visibility: hidden;}
@@ -36,13 +36,16 @@ st.markdown("""
     /* Medical Blue Theme */
     .main {background-color: #F6F8FC;}
     .trust-badge {
-        display: inline-flex; align-items: center; gap: 6px;
-        background: white; border: 1px solid #E3E8F0;
-        padding: 6px 12px; border-radius: 20px;
-        font-size: 11px; font-weight: 600; color: #0D47A1;
-        margin-right: 8px;
+        background:#E3F2FD; border:1px solid #90CAF9; 
+        border-radius:8px; padding:6px 12px; 
+        font-size:12px; color:#0D47A1; display:inline-block; margin:2px;
     }
     .clinic-card {
+        background:white; border-radius:12px; padding:20px;
+        box-shadow:0 2px 10px rgba(0,0,0,0.05); border:1px solid #E0E0E0;
+    }
+</style>
+""", unsafe_allow_html=True)
         background: white; padding: 22px; border-radius: 16px;
         box-shadow: 0 8px 20px rgba(0,0,0,0.06);
         border: 1px solid #EEF2F7;

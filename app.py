@@ -54,11 +54,7 @@ st.divider()
 st.markdown("---")
 st.markdown("""
 <div style='text-align:center; color:#888; font-size:11px; line-height:1.5;'>
-    <b>Need help?</b> WhatsApp Support: <a href='https://wa.me/263771477408' style='color:#0D47A1; font-weight:600;'>0771477408</a><br>
-    Sahwira Health respects your privacy. Your health data is encrypted, stored securely, and never shared. This app does not replace professional medical advice. For emergencies, dial 994.<br>
-    © 2026 Sahwira Health • Harare, Zimbabwe
-</div>
-""", unsafe_allow_html=True)
+    <b>Need help?</b> WhatsApp Support: <a href='https://wa.me/263771477408' style='color:#0D47A1; font-weight:600;'>0771477408</a><br
 
 import streamlit as st
 import pandas as pd
@@ -224,3 +220,7 @@ else:
         For emergencies dial 994. This app does not replace doctor advice.
         </div>
         """, unsafe_allow_html=True)
+    Sahwira Health respects your privacy. Your health data is encrypted, stored securely, and never shared. This app does not replace professional medical advice. For emergencies, dial 994.<br>
+    © 2026 Sahwira Health • Harare, Zimbabwe
+</div>
+""", unsafe_allow_html=True)

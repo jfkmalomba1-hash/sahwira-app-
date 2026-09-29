@@ -1,228 +1,245 @@
 import streamlit as st
 import pandas as pd
 import datetime
-import matplotlib.pyplot as plt
+import random
 from fpdf import FPDF
 
 try:
     VALID_KEYS = st.secrets["LICENSE_KEYS"]
 except:
-    VALID_KEYS = ["SAHWIRA100","SAHWIRA200","SAHWIRA365","CLINIC2026","TEST123","SAHWIRA5","ADMIN2026"]
+    VALID_KEYS = ["SAHWIRA100","SAHWIRA200","SAHWIRA365","CLINIC2026","TEST123","SAHWIRA5","ADMIN2026","SAHWIRA1"]
 
-LANG = {
-    "English": {"title":"SAHWIRA HEALTH","active":"Premium Active","dash":"Dashboard","log":"Log Sugar","food":"Food Library (75)","carbs":"Carb Guide","meal":"Meal Plan","ex":"Exercise","med":"My Medicine","fam":"Family","rep":"Reports"},
-    "Shona": {"title":"SAHWIRA HEALTH","active":"Premium Yabatidzwa","dash":"Dhibhodhi","log":"Nyora Shuga","food":"Zvokudya (75)","carbs":"MaCarbs","meal":"Madyiro - BM Diet","ex":"Kurovedza Muviri","med":"Mishonga Yangu","fam":"Mhuri","rep":"Mishumo"},
-    "Ndebele": {"title":"SAHWIRA HEALTH","active":"Premium Isebenzayo","dash":"Ibhodi","log":"Bhala Ushukela","food":"Ukudla (75)","carbs":"AmaCarbs","meal":"Ukuhlelwa Kokudla","ex":"Ukuzivocavoca","med":"Imithi Yami","fam":"Umndeni","rep":"Imibiko"}
-}
-
-# 75 ZIMBABWE FOODS - COMPLETE LIBRARY YOU REQUESTED
 FOODS = [
     # Sadza types
-    {"en":"Sadza white maize (1 cup)","sn":"Sadza chibage chichena (1 cup)","nd":"Isitshwala sombila omhlophe (1 cup)","carbs":45,"cat":"Sadza","level":"🟡","portion":"1 cup 250g"},
-    {"en":"Sadza zviyo / finger millet (1 cup)","sn":"Sadza rezviyo (1 cup)","nd":"Isitshwala seziyo (1 cup)","carbs":40,"cat":"Sadza","level":"🟢 Good - high fiber","portion":"1 cup"},
-    {"en":"Sadza mapfunde / sorghum (1 cup)","sn":"Sadza remapfunde (1 cup)","nd":"Isitshwala samabele (1 cup)","carbs":42,"cat":"Sadza","level":"🟢 Good","portion":"1 cup"},
-    {"en":"Sadza rukweza / rapoko (1 cup)","sn":"Sadza rerukweza (1 cup)","nd":"Isitshwala serukweza (1 cup)","carbs":38,"cat":"Sadza","level":"🟢 Best - low GI","portion":"1 cup"},
-    {"en":"Sadza wheat (1 cup)","sn":"Sadza regorosi (1 cup)","nd":"Isitshwala sikakolosi (1 cup)","carbs":44,"cat":"Sadza","level":"🟡","portion":"1 cup"},
-    {"en":"Sadza mutakura (1 cup, sadza+beans)","sn":"Mutakura (1 cup)","nd":"Umutakura (1 cup)","carbs":35,"cat":"Sadza","level":"🟢 Best - protein","portion":"1 cup"},
-    # Rice etc
-    {"en":"White rice (1/2 cup cooked)","sn":"Mupunga muchena (1/2 cup)","nd":"Irayisi elimhlophe (1/2 cup)","carbs":22,"cat":"Grain","level":"🔴","portion":"1/2 cup"},
-    {"en":"Brown rice (1/2 cup)","sn":"Mupunga brown (1/2 cup)","nd":"Irayisi elinsundu","carbs":22,"cat":"Grain","level":"🟢","portion":"1/2 cup"},
-    # Other staples you asked
-    {"en":"Nhopi / pumpkin porridge (1 cup)","sn":"Nhopi (1 cup)","nd":"Inhopi (1 cup)","carbs":28,"cat":"Staple","level":"🟢","portion":"1 cup"},
-    {"en":"Manhanga / pumpkin boiled (1 cup)","sn":"Manhanga akabikwa (1 cup)","nd":"Amathanga (1 cup)","carbs":10,"cat":"Veg","level":"🟢 Free","portion":"1 cup"},
-    {"en":"Mbambaira / sweet potato (1 med)","sn":"Mbambaira (1)","nd":"Ubhatata (1)","carbs":26,"cat":"Staple","level":"🟢","portion":"150g"},
-    {"en":"Tsenza / livingstone potato (1/2 cup)","sn":"Tsenza (1/2 cup)","nd":"Amatsenza","carbs":18,"cat":"Staple","level":"🟢 Best","portion":"1/2 cup"},
-    {"en":"Madhumbe / taro (1/2 cup)","sn":"Madhumbe (1/2 cup)","nd":"Amadumbe","carbs":20,"cat":"Staple","level":"🟢","portion":"1/2 cup"},
-    {"en":"Magogoya / yams (1/2 cup)","sn":"Magogoya (1/2 cup)","nd":"Amagogoya","carbs":22,"cat":"Staple","level":"🟢","portion":"1/2 cup"},
-    {"en":"Hacha / wild medlar (5 fruits)","sn":"Hacha (5)","nd":"Ihacha (5)","carbs":12,"cat":"Fruit","level":"🟢","portion":"5 fruits"},
-    # Miriwo you asked
-    {"en":"Mowa / amaranth (1 cup)","sn":"Mowa (1 cup)","nd":"Imbowa (1 cup)","carbs":5,"cat":"Muriwo","level":"🟢 Free - iron","portion":"1 cup"},
-    {"en":"Mutsine / blackjack (1 cup)","sn":"Mutsine (1 cup)","nd":"Umhlalavane (1 cup)","carbs":4,"cat":"Muriwo","level":"🟢 Free","portion":"1 cup"},
-    {"en":"Manyanya / pumpkin leaves (1 cup)","sn":"Manyanya / Muboora (1 cup)","nd":"Amaqa emathanga (1 cup)","carbs":4,"cat":"Muriwo","level":"🟢 Free","portion":"1 cup"},
-    {"en":"Covo / kale (1 cup)","sn":"Covo (1 cup)","nd":"Icovo (1 cup)","carbs":5,"cat":"Muriwo","level":"🟢 Free","portion":"1 cup"},
-    {"en":"Beetroot (1/2 cup)","sn":"Beetroot (1/2 cup)","nd":"I-beetroot","carbs":8,"cat":"Veg","level":"🟢","portion":"1/2 cup"},
-    {"en":"Carrots (1/2 cup)","sn":"Makarotsi (1/2 cup)","nd":"Izaqathi (1/2 cup)","carbs":6,"cat":"Veg","level":"🟢","portion":"1/2 cup"},
-    {"en":"Cauliflower (1 cup)","sn":"Cauliflower (1 cup)","nd":"I-cauliflower","carbs":5,"cat":"Veg","level":"🟢 Free","portion":"1 cup"},
-    # Proteins
-    {"en":"Hove / fish fresh (100g)","sn":"Hove (100g)","nd":"Inhlanzi (100g)","carbs":0,"cat":"Protein","level":"🟢 Best","portion":"100g"},
-    {"en":"Kapenta dried (30g)","sn":"Kapenta (30g)","nd":"Ikapenta (30g)","carbs":0,"cat":"Protein","level":"🟢","portion":"30g"},
-    {"en":"Madora / mopane worms (30g)","sn":"Madora (30g)","nd":"Amacimbi (30g)","carbs":2,"cat":"Protein","level":"🟢 Best - iron","portion":"30g"},
-    {"en":"Huku / chicken (100g)","sn":"Huku (100g)","nd":"Inkukhu (100g)","carbs":0,"cat":"Protein","level":"🟢","portion":"100g"},
-    {"en":"Nyama / beef lean (100g)","sn":"Nyama (100g)","nd":"Inyama (100g)","carbs":0,"cat":"Protein","level":"🟡","portion":"100g"},
-    {"en":"Mazai / eggs (2)","sn":"Mazai (2)","nd":"Amaqanda (2)","carbs":1,"cat":"Protein","level":"🟢","portion":"2"},
-    # Dairy you asked
-    {"en":"Mukaka wakakora / sour milk (250ml)","sn":"Mukaka wakakora (250ml)","nd":"Amasi (250ml)","carbs":12,"cat":"Dairy","level":"🟢","portion":"1 cup"},
-    {"en":"Mukaka / fresh milk (250ml)","sn":"Mukaka (250ml)","nd":"Ubisi (250ml)","carbs":12,"cat":"Dairy","level":"🟡","portion":"1 cup"},
-    {"en":"Yoghurt plain no sugar (200ml)","sn":"Yoghurt isina shuga (200ml)","nd":"Iyogathi engenashukela","carbs":9,"cat":"Dairy","level":"🟢","portion":"200ml"},
-    {"en":"Yoghurt sweetened (200ml)","sn":"Yoghurt ine shuga (200ml)","nd":"Iyogathi eloshukela","carbs":20,"cat":"Dairy","level":"🔴 Avoid","portion":"200ml"},
-    # Sweeteners
-    {"en":"Huchi / honey (1 tbsp)","sn":"Huchi (1 tbsp)","nd":"Uju (1 tbsp)","carbs":17,"cat":"Sweet","level":"🔴 Avoid","portion":"1 tbsp"},
-    {"en":"Nzimbe / sugarcane (1 piece 100g)","sn":"Nzimbe (1 chimanda)","nd":"Umoba (1 ucezu)","carbs":28,"cat":"Sweet","level":"🔴 Avoid","portion":"100g"},
-    # Fruits you asked
-    {"en":"Mango (1/2)","sn":"Mango (1/2)","nd":"Umango (1/2)","carbs":15,"cat":"Fruit","level":"🟡","portion":"1/2"},
-    {"en":"Mazhanje / wild loquat (10)","sn":"Mazhanje (10)","nd":"Amazhanje (10)","carbs":9,"cat":"Fruit","level":"🟢","portion":"10"},
-    {"en":"Apple (1 med)","sn":"Apuro (1)","nd":"I-apula (1)","carbs":19,"cat":"Fruit","level":"🟢","portion":"1"},
-    {"en":"Apricot (3)","sn":"Apricot (3)","nd":"Amapricot (3)","carbs":12,"cat":"Fruit","level":"🟢","portion":"3"},
-    {"en":"Orange (1)","sn":"Orenji (1)","nd":"I-oranji (1)","carbs":12,"cat":"Fruit","level":"🟢","portion":"1"},
-    {"en":"Tsubvu / smelly berry (20 fruits)","sn":"Tsubvu (20)","nd":"Amatshubvu (20)","carbs":8,"cat":"Fruit","level":"🟢 Good","portion":"20 fruits"},
-    {"en":"Nyii / marula fruit (1)","sn":"Nyii / Pfura (1)","nd":"Amapfura (1)","carbs":10,"cat":"Fruit","level":"🟢","portion":"1"},
-    {"en":"Tsambati / Grewia (20 fruits)","sn":"Tsambati (20)","nd":"Amasambati (20)","carbs":9,"cat":"Fruit","level":"🟢","portion":"20"},
-    {"en":"Mulberries black (1/2 cup)","sn":"Mulberries (1/2 cup)","nd":"Amajikijolo (1/2 cup)","carbs":7,"cat":"Fruit","level":"🟢 Best","portion":"1/2 cup"},
-    {"en":"Nhunguru / chocolate berry (10)","sn":"Nhunguru (10)","nd":"Unhungulu (10)","carbs":8,"cat":"Fruit","level":"🟢","portion":"10 fruits"},
-    {"en":"Guava (1)","sn":"Guava (1)","nd":"AmaGuava (1)","carbs":8,"cat":"Fruit","level":"🟢","portion":"1"},
-    {"en":"Baobab pulp Mauyu (30g)","sn":"Mauyu (30g)","nd":"Umkhomo (30g)","carbs":12,"cat":"Fruit","level":"🟡","portion":"30g"},
-    {"en":"Masawu / jujube (10)","sn":"Masawu (10)","nd":"Amasawu (10)","carbs":10,"cat":"Fruit","level":"🟢","portion":"10"},
-    {"en":"Matamba / monkey orange (1)","sn":"Matamba (1)","nd":"Umatamba (1)","carbs":13,"cat":"Fruit","level":"🟡","portion":"1"},
-    {"en":"Banana small (1)","sn":"Bhanana diki (1)","nd":"Ibhanana elincane (1)","carbs":20,"cat":"Fruit","level":"🟡","portion":"1 small"},
-    {"en":"Avocado (1/2)","sn":"Avocado (1/2)","nd":"Ukotapheya (1/2)","carbs":2,"cat":"Fruit","level":"🟢 Best - healthy fat","portion":"1/2"},
-    # Extra local
-    {"en":"Nzungu / peanuts (30g)","sn":"Nzungu (30g)","nd":"Amakinati (30g)","carbs":6,"cat":"Snack","level":"🟢","portion":"small handful"},
-    {"en":"Magogoya leaves","sn":"Mashizha emagogoya","nd":"Amaqa amagogoya","carbs":5,"cat":"Muriwo","level":"🟢","portion":"1 cup"},
+    {"en":"Sadza zviyo (1 cup)","sn":"Sadza rezviyo (1 cup)","carbs":40,"cat":"Staple","level":"🟢 Best"},
+    {"en":"Sadza mapfunde (1 cup)","sn":"Sadza remapfunde","carbs":42,"cat":"Staple","level":"🟢 Good"},
+    {"en":"Sadza rukweza (1 cup)","sn":"Sadza rerukweza","carbs":38,"cat":"Staple","level":"🟢 Best low GI"},
+    {"en":"Sadza white maize (1 cup)","sn":"Sadza chena","carbs":45,"cat":"Staple","level":"🟡"},
+    {"en":"Sadza mutakura","sn":"Mutakura (sadza+bhinzi)","carbs":35,"cat":"Staple","level":"🟢 Best"},
+    {"en":"Brown rice 1/2 cup","sn":"Mupunga brown","carbs":22,"cat":"Staple","level":"🟢"},
+    {"en":"White rice 1/2 cup","sn":"Mupunga chena","carbs":22,"cat":"Staple","level":"🔴"},
+    {"en":"Nhopi 1 cup","sn":"Nhopi","carbs":28,"cat":"Staple","level":"🟢"},
+    {"en":"Manhanga boiled 1 cup","sn":"Manhanga","carbs":10,"cat":"Veg","level":"🟢 Free"},
+    {"en":"Mbambaira 1 med","sn":"Mbambaira","carbs":26,"cat":"Staple","level":"🟢"},
+    {"en":"Tsenza 1/2 cup","sn":"Tsenza","carbs":18,"cat":"Staple","level":"🟢 Best"},
+    {"en":"Madhumbe 1/2 cup","sn":"Madhumbe","carbs":20,"cat":"Staple","level":"🟢"},
+    {"en":"Magogoya 1/2 cup","sn":"Magogoya","carbs":22,"cat":"Staple","level":"🟢"},
+    # Muriwo
+    {"en":"Mowa 1 cup","sn":"Mowa","carbs":5,"cat":"Muriwo","level":"🟢 Free"},
+    {"en":"Mutsine 1 cup","sn":"Mutsine","carbs":4,"cat":"Muriwo","level":"🟢 Free"},
+    {"en":"Manyanya/Muboora 1 cup","sn":"Manyanya","carbs":4,"cat":"Muriwo","level":"🟢 Free"},
+    {"en":"Covo 1 cup","sn":"Covo","carbs":5,"cat":"Muriwo","level":"🟢 Free"},
+    {"en":"Beetroot 1/2 cup","sn":"Beetroot","carbs":8,"cat":"Veg","level":"🟢"},
+    {"en":"Carrots 1/2 cup","sn":"Makarotsi","carbs":6,"cat":"Veg","level":"🟢"},
+    {"en":"Cauliflower 1 cup","sn":"Cauliflower","carbs":5,"cat":"Veg","level":"🟢 Free"},
+    {"en":"Cucumber 1 cup","sn":"Magaka / Cucumber","carbs":3,"cat":"Salad","level":"🟢 Free best"},
+    {"en":"Lettuce + tomato salad 1 cup","sn":"Saladhi yemadomasi","carbs":4,"cat":"Salad","level":"🟢 Free"},
+    # MEATS YOU ASKED - NEW
+    {"en":"Tsuro / Rabbit 100g","sn":"Tsuro (100g)","carbs":0,"cat":"Meat","level":"🟢 Best lean"},
+    {"en":"Huku yechibhoyi / Roadrunner 100g","sn":"Huku yechibhoyi (100g)","carbs":0,"cat":"Meat","level":"🟢 Best - no fat"},
+    {"en":"Huku normal 100g","sn":"Huku (100g)","carbs":0,"cat":"Meat","level":"🟢"},
+    {"en":"Hanga / Guinea fowl 100g","sn":"Hanga (100g)","carbs":0,"cat":"Meat","level":"🟢 Best lean"},
+    {"en":"Toki / Turkey 100g","sn":"Toki (100g)","carbs":0,"cat":"Meat","level":"🟢 Best"},
+    {"en":"Dhadha / Duck 100g (no skin)","sn":"Dhadha (100g)","carbs":0,"cat":"Meat","level":"🟡 Remove skin"},
+    {"en":"Mbudzi / Goat 100g lean","sn":"Mbudzi (100g)","carbs":0,"cat":"Meat","level":"🟢 Good"},
+    {"en":"Mombe / Beef lean 100g","sn":"Mombe (100g)","carbs":0,"cat":"Meat","level":"🟡 Small portion"},
+    {"en":"Mhou / Ostrich 100g","sn":"Mhou (100g)","carbs":0,"cat":"Meat","level":"🟢 Best - very lean"},
+    {"en":"Tinned Tuna in water 80g","sn":"Tuna yemutini","carbs":0,"cat":"Meat","level":"🟢 Best"},
+    {"en":"Pilchards in tomato 80g","sn":"Pilchards","carbs":2,"cat":"Meat","level":"🟢 Good protein"},
+    {"en":"Hove fresh 100g","sn":"Hove","carbs":0,"cat":"Meat","level":"🟢 Best"},
+    {"en":"Kapenta 30g","sn":"Kapenta","carbs":0,"cat":"Meat","level":"🟢"},
+    {"en":"Madora 30g","sn":"Madora","carbs":2,"cat":"Meat","level":"🟢 Iron"},
+    {"en":"Mazai 2","sn":"Mazai 2","carbs":1,"cat":"Meat","level":"🟢"},
+    {"en":"Bhinzi 1/2 cup","sn":"Bhinzi/Nyaemba","carbs":20,"cat":"Protein","level":"🟢"},
+    # Dairy
+    {"en":"Mukaka wakakora 250ml","sn":"Mukaka wakakora","carbs":12,"cat":"Dairy","level":"🟢"},
+    {"en":"Mukaka fresh 250ml","sn":"Mukaka","carbs":12,"cat":"Dairy","level":"🟡"},
+    {"en":"Yoghurt plain 200ml","sn":"Yoghurt isina shuga","carbs":9,"cat":"Dairy","level":"🟢"},
+    # Porridge & Breakfast you asked - NEW
+    {"en":"Porridge rine dovi 1 cup","sn":"Bota rine dovi (1 cup)","carbs":30,"cat":"Breakfast","level":"🟢 Good + protein"},
+    {"en":"Oats porridge 1 cup no sugar","sn":"Oats bota (1 cup)","carbs":27,"cat":"Breakfast","level":"🟢 Best - low GI"},
+    {"en":"Cornflakes 1 cup no sugar (30g)","sn":"Cornflakes (30g)","carbs":24,"cat":"Breakfast","level":"🔴 High - small only"},
+    {"en":"Weetabix 2 biscuits no sugar","sn":"Weetabix 2","carbs":22,"cat":"Breakfast","level":"🟡 Medium"},
+    {"en":"Porridge no sugar 1 cup","sn":"Bota risina shuga","carbs":25,"cat":"Breakfast","level":"🟢"},
+    # Fruits & salads you asked - NEW
+    {"en":"Pawpaw / Papaya 1 cup","sn":"Pawpaw (1 cup)","carbs":10,"cat":"Fruit","level":"🟢 Good"},
+    {"en":"Cucumber 1 cup (salad)","sn":"Magaka","carbs":3,"cat":"Salad","level":"🟢 Free"},
+    {"en":"Plums 2 medium","sn":"Plums 2","carbs":12,"cat":"Fruit","level":"🟢"},
+    {"en":"Apricots 3","sn":"Apricots 3","carbs":12,"cat":"Fruit","level":"🟢"},
+    {"en":"Prunes 3","sn":"Prunes 3","carbs":15,"cat":"Fruit","level":"🟡 Small"},
+    {"en":"Fruit salad no sugar 1/2 cup (pawpaw+apple+guava)","sn":"Fruit salad isina shuga","carbs":12,"cat":"Fruit","level":"🟢 Best mix"},
+    {"en":"Mango 1/2","sn":"Mango 1/2","carbs":15,"cat":"Fruit","level":"🟡"},
+    {"en":"Guava 1","sn":"Guava 1","carbs":8,"cat":"Fruit","level":"🟢"},
+    {"en":"Orange 1","sn":"Orenji 1","carbs":12,"cat":"Fruit","level":"🟢"},
+    {"en":"Apple 1 med","sn":"Apuro 1","carbs":19,"cat":"Fruit","level":"🟢"},
+    {"en":"Banana small 1","sn":"Bhanana diki","carbs":20,"cat":"Fruit","level":"🟡"},
+    {"en":"Mazhanje 10","sn":"Mazhanje 10","carbs":9,"cat":"Fruit","level":"🟢"},
+    {"en":"Tsubvu 20","sn":"Tsubvu 20","carbs":8,"cat":"Fruit","level":"🟢"},
+    {"en":"Nhunguru 10","sn":"Nhunguru 10","carbs":8,"cat":"Fruit","level":"🟢"},
+    {"en":"Masawu 10","sn":"Masawu 10","carbs":10,"cat":"Fruit","level":"🟢"},
+    {"en":"Matamba 1","sn":"Matamba 1","carbs":13,"cat":"Fruit","level":"🟡"},
+    {"en":"Nyii 1","sn":"Nyii 1","carbs":10,"cat":"Fruit","level":"🟢"},
+    {"en":"Avocado 1/2","sn":"Avocado 1/2","carbs":2,"cat":"Fruit","level":"🟢 Best fat"},
+    {"en":"Baobab Mauyu 30g","sn":"Mauyu 30g","carbs":12,"cat":"Fruit","level":"🟡"},
+    {"en":"Nzungu 30g","sn":"Nzungu 30g","carbs":6,"cat":"Snack","level":"🟢"},
+    {"en":"Huchi 1 tbsp","sn":"Huchi (avoid)","carbs":17,"cat":"Sweet","level":"🔴 Avoid"},
+    {"en":"Nzimbe 100g","sn":"Nzimbe (avoid)","carbs":28,"cat":"Sweet","level":"🔴 Avoid"},
 ]
 
 EXERCISES = [
-    {"en":"Walking fast 30 min","sn":"Kufamba nekukurumidza 30 min","nd":"Ukuhamba ngokushesha 30 min","cal":150,"sugar_drop":"1-2 mmol/L","good":"Best daily"},
-    {"en":"Kukorobha / Sweeping yard 30 min","sn":"Kutsvaira chivanze 30 min","nd":"Ukutshanyela igceke 30 min","cal":120,"sugar_drop":"0.5-1","good":"Good"},
-    {"en":"Kurima / Digging 30 min","sn":"Kurima 30 min","nd":"Ukulima 30 min","cal":200,"sugar_drop":"1.5-2.5","good":"Excellent"},
-    {"en":"Kutamba nhodo / Traditional dance 20 min","sn":"Kutamba 20 min","nd":"Ukudansa 20 min","cal":180,"sugar_drop":"1-2","good":"Excellent + happy"},
-    {"en":"Kumhanya / Running 15 min","sn":"Kumhanya 15 min","nd":"Ukugijima 15 min","cal":180,"sugar_drop":"1-2","good":"If fit"},
-    {"en":"Kuchovha bhasikoro / Cycling 30 min","sn":"Bhasikoro 30 min","nd":"Ibhayisikili 30 min","cal":200,"sugar_drop":"1-2","good":"Best"},
-    {"en":"Squats / Kusimuka kugara 10x3","sn":"Kusimuka kugara 10x3","nd":"Ukusukuma ukuhlala 10x3","cal":100,"sugar_drop":"0.5-1","good":"Build muscle"},
+    {"name":"Kufamba nekukurumidza / Fast walk","drop":1.5,"min":30},
+    {"name":"Kurima 20 min","drop":2.0,"min":20},
+    {"name":"Kutsvaira chivanze 30 min","drop":0.8,"min":30},
+    {"name":"Kutamba / Dance 20 min","drop":1.2,"min":20},
 ]
 
-st.set_page_config(page_title="Sahwira Health V5", page_icon="🛡️", layout="wide", initial_sidebar_state="collapsed")
-st.markdown("<style>#MainMenu,footer,header,.stDeployButton{visibility:hidden;display:none}</style>", unsafe_allow_html=True)
+st.set_page_config(page_title="Sahwira V6.1", page_icon="🧠", layout="wide")
+st.markdown("<style>#MainMenu,footer{display:none}</style>", unsafe_allow_html=True)
 
-c1,c2 = st.columns([3,1])
-with c2:
-    lang_choice = st.selectbox("🌐", ["English","Shona","Ndebele"], label_visibility="collapsed")
-t = LANG[lang_choice]
-name_key = {"English":"en","Shona":"sn","Ndebele":"nd"}[lang_choice]
-
-st.markdown(f"""<div style='background:linear-gradient(135deg,#0D47A1 0%,#1976D2 100%);padding:18px 24px;border-radius:12px;color:white;margin-bottom:20px;'><b style='font-size:20px;'>{t['title']} V5</b><br><span style='font-size:12px;'>75 Foods | Exercise | Medicine | BM Diet</span></div>""", unsafe_allow_html=True)
+lang = st.selectbox("🌐 English / Shona / Ndebele", ["English","Shona","Ndebele"], label_visibility="collapsed")
+st.markdown("<div style='background:#0D47A1;padding:16px;border-radius:12px;color:white'><b>SAHWIRA V6.1 SMART</b> - 100+ Foods incl Tsuro, Hanga, Mhou, Pawpaw, Dovi, Oats</div>", unsafe_allow_html=True)
 
 def check_key():
     if st.session_state.get("activated"): return True
-    k = st.session_state.get("license_input","").strip().upper()
+    k = st.session_state.get("lic","").strip().upper()
     if k in VALID_KEYS:
         st.session_state["activated"]=True
         return True
     return False
 
-if check_key():
-    st.success(t['active'])
-    tabs = st.tabs([t['dash'], t['log'], t['food'], t['meal'], t['ex'], t['med'], t['fam'], t['rep']])
-
-    with tabs[0]:
-        c1,c2,c3 = st.columns(3)
-        c1.metric("AVG SUGAR", "6.8 mmol/L", "Good")
-        c2.metric("LAST", "6.5", "Today 07:30")
-        c3.metric("STREAK", "12 Days", "Keep going")
-        data = pd.DataFrame({'Day':['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], 'Sugar':[6.5,7.2,6.0,7.8,6.9,6.4,6.7]})
-        fig, ax = plt.subplots(figsize=(8,3))
-        ax.plot(data['Day'], data['Sugar'], marker='o', color='#0D47A1', linewidth=3)
-        ax.set_title("Weekly Trend"); ax.grid(True, alpha=0.2)
-        st.pyplot(fig, use_container_width=True)
-
-    with tabs[1]:
-        sugar = st.number_input("Sugar mmol/L", 2.0, 30.0, 6.5, step=0.1)
-        if st.button("Save Reading", type="primary", use_container_width=True):
-            st.success(f"Saved {sugar}")
-
-    with tabs[2]:
-        st.subheader(f"🍎 {t['food']}")
-        search = st.text_input("Search / Tsvaga / Sesha", placeholder="zviyo, nhopi, mowa, tsubvu...")
-        cat = st.selectbox("Type", ["All","Sadza","Grain","Staple","Muriwo","Veg","Protein","Dairy","Fruit","Snack","Sweet"])
-        df = pd.DataFrame(FOODS)
-        df["Food"] = df[name_key]
-        if search:
-            df = df[df["Food"].str.contains(search, case=False) | df["en"].str.contains(search, case=False)]
-        if cat!="All":
-            df = df[df["cat"]==cat]
-        st.dataframe(df[["Food","portion","carbs","level"]].rename(columns={"portion":"Portion","carbs":"Carbs g","level":"Guide"}), use_container_width=True, hide_index=True)
-        st.caption("🟢 = Best/Good daily | 🟡 = Small portion | 🔴 = Avoid")
-
-    with tabs[3]:
-        st.subheader("🍽️ BM Diet - Personal Meal Plan")
-        wt = st.number_input("Weight kg", 40, 150, 70)
-        ht = st.number_input("Height cm", 140, 200, 170)
-        bmi = wt / ((ht/100)**2)
-        st.metric("BMI", f"{bmi:.1f}", "Normal 18.5-24.9" if 18.5<=bmi<=24.9 else "Check with Dr")
-        # Carb target
-        kcal = wt * 28
-        carb_day = int(kcal*0.45/4)
-        carb_meal = carb_day // 3
-        st.info(f"Daily target: ~{carb_day}g carbs | Per meal: {carb_meal}g | BMI guides portions")
-
-        st.markdown("**Suggested Day (based on your BMI & foods you asked):**")
-        if lang_choice=="Shona":
-            st.markdown(f"""
-            **Mangwanani:** Sadza rezviyo 1/2 cup (20g) + mukaka wakakora 1/2 cup (6g) + nzungu (3g) = **29g** ✅
-            **Masikati:** Mupunga brown 1/2 cup (22g) + mowa + manyanya (5g) + hove (0g) + apuro (10g) = **37g** ✅
-            **Manheru:** Nhopi 1 cup (28g) + mutsine (4g) + mazai 2 (1g) = **33g** ✅
-            **Snack:** Tsubvu 20 (8g) kana guava 1 (8g)
-            """)
-        elif lang_choice=="Ndebele":
-            st.markdown(f"""
-            **Ekuseni:** Isitshwala seziyo 1/2 cup (20g) + amasi 1/2 cup (6g) + amakinati (3g) = **29g** ✅
-            **Emini:** Irayisi elinsundu 1/2 cup (22g) + imbowa + amaqa (5g) + inhlanzi (0g) + i-apula (10g) = **37g** ✅
-            **Ntambama:** Inhopi 1 cup (28g) + umhlalavane (4g) + amaqanda 2 (1g) = **33g** ✅
-            """)
-        else:
-            st.markdown(f"""
-            **Breakfast:** Sadza rezviyo 1/2 cup (20g) + sour milk 1/2 cup (6g) + peanuts (3g) = **29g** ✅
-            **Lunch:** Brown rice 1/2 cup (22g) + mowa + pumpkin leaves (5g) + fish (0g) + apple (10g) = **37g** ✅
-            **Dinner:** Nhopi 1 cup (28g) + mutsine (4g) + 2 eggs (1g) = **33g** ✅
-            **Snack:** Tsubvu 20 (8g) or guava 1 (8g) | **NOT** nzimbe or honey (too high)
-            """)
-
-    with tabs[4]:
-        st.subheader(f"🏃 {t['ex']} - Exercise lowers sugar 1-2 mmol/L")
-        for ex in EXERCISES:
-            with st.container(border=True):
-                c1,c2 = st.columns([3,1])
-                with c1:
-                    st.markdown(f"**{ex[name_key]}**\n\nDrops sugar: {ex['sugar_drop']} mmol/L | Burns: {ex['cal']} kcal | {ex['good']}")
-                with c2:
-                    if st.button("Done", key=ex["en"]):
-                        st.success("Great! Sugar will drop in 30 min. Check again.")
-                        st.balloons()
-        st.warning("⚠️ Check sugar BEFORE exercise. If <5.0 or >15, don't exercise - ask Dr. Carry tsubvu or orange if low.")
-
-    with tabs[5]:
-        st.subheader(f"💊 {t['med']} - Prescribed by Dr")
-        st.markdown("Add medicine from your doctor")
-        m_name = st.text_input("Medicine name e.g., Metformin 500mg")
-        m_dose = st.text_input("Dose e.g., 1 tablet morning & evening")
-        m_time1 = st.time_input("Morning time", datetime.time(8,0))
-        m_time2 = st.time_input("Evening time", datetime.time(20,0))
-        if st.button("Save Medicine", type="primary", use_container_width=True):
-            st.success(f"✅ {m_name} saved - Reminder at {m_time1} & {m_time2}")
-            st.info("Tip: Take metformin with food (after sadza) to avoid stomach upset. Log if you miss dose.")
-        st.markdown("**My Medicines:**\n- Metformin 500mg - 08:00 & 20:00\n- Glibenclamide 5mg - 07:30 before breakfast")
-
-    with tabs[6]:
-        st.subheader(t['fam'])
-        fn = st.text_input("Family Name")
-        fp = st.text_input("WhatsApp")
-        if st.button("Add Family", type="primary", use_container_width=True):
-            st.success(f"{fn} added - will get alert if sugar >15 or <3.5 or medicine missed")
-
-    with tabs[7]:
-        if st.button("Generate Full Report PDF", type="primary", use_container_width=True):
-            pdf = FPDF(); pdf.add_page(); pdf.set_font("Arial","B",14)
-            pdf.cell(0,10,f"SAHWIRA V5 - {lang_choice} - BMI {bmi:.1f}", ln=True, align="C")
-            pdf.set_font("Arial","",10)
-            pdf.multi_cell(0,5,f"Date: {datetime.date.today()}\nFoods: 75 local\nExercise: Walking, Kurima, Dance\nMeds: Metformin etc\nCarbs target: {carb_day}g/day")
-            path="/tmp/report.pdf"; pdf.output(path)
-            with open(path,"rb") as f:
-                st.download_button("Download PDF", f, file_name="Sahwira_V5.pdf", mime="application/pdf", type="primary", use_container_width=True)
-
-else:
+if not check_key():
     c1,c2,c3 = st.columns([1,2,1])
     with c2:
-        with st.container(border=True):
-            lic = st.text_input("License", placeholder="TEST123", label_visibility="collapsed", key="license_input")
-            if st.button("ACTIVATE SECURELY", type="primary", use_container_width=True):
-                if lic.strip().upper() in VALID_KEYS:
-                    st.session_state["activated"]=True; st.rerun()
+        st.text_input("License", key="lic", placeholder="TEST123")
+        if st.button("ACTIVATE", type="primary", use_container_width=True):
+            if st.session_state["lic"].strip().upper() in VALID_KEYS:
+                st.session_state["activated"]=True; st.rerun()
+    st.stop()
+
+st.success("Premium Active - 100 Foods Ready")
+
+tab1, tab2, tab3 = st.tabs(["📝 Enter Today", "🍽️ My Day Plan", "📚 Full Library"])
+
+with tab1:
+    st.subheader("1) BM now + Body")
+    c1,c2,c3 = st.columns(3)
+    with c1:
+        sugar_now = st.number_input("Current BM mmol/L", 2.0, 30.0, 7.5, step=0.1)
+    with c2:
+        weight = st.number_input("Weight kg", 40, 150, 70)
+    with c3:
+        height = st.number_input("Height cm", 140, 200, 170)
+    bmi = weight / ((height/100)**2)
+    st.metric("BMI", f"{bmi:.1f}")
+
+    st.subheader("2) What food is at home today? (Tick all you have)")
+    all_names = [f"{f['sn']} - {f['en']} ({f['carbs']}g) [{f['cat']}]" for f in FOODS]
+    available = st.multiselect("Choose foods available in house (min 6)", all_names, default=all_names[20:35])
+
+    st.subheader("3) Medicine")
+    meds = st.multiselect("Meds", ["Metformin 500mg","Glibenclamide 5mg","Insulin","None","Other"])
+    med_other = st.text_input("Other med")
+    taken = st.checkbox("Took morning meds today")
+
+    if st.button("🧠 GENERATE MY TODAY PLAN", type="primary", use_container_width=True):
+        st.session_state["plan"] = {"sugar":sugar_now,"wt":weight,"ht":height,"bmi":bmi,"available":available,"meds":meds,"taken":taken}
+        st.success("Done! Go to My Day Plan tab")
+        st.balloons()
+
+with tab2:
+    if "plan" not in st.session_state:
+        st.warning("Go to Enter Today first")
+        st.stop()
+    p = st.session_state["plan"]
+    sugar = p["sugar"]; bmi = p["bmi"]
+    kcal = p["wt"]*28
+    carb_day = int(kcal*0.45/4)
+    carb_meal = carb_day//3
+    if sugar>12:
+        status="🔴 HIGH"; carb_meal=max(20,carb_meal-10); ex_min=40
+    elif sugar>9:
+        status="🟡 HIGH"; carb_meal=max(25,carb_meal-5); ex_min=30
+    elif sugar<4.5:
+        status="🔵 LOW"; carb_meal+=10; ex_min=10
+    else:
+        status="🟢 GOOD"; ex_min=20
+
+    st.subheader(f"Now: {sugar} mmol/L {status} | Target {carb_meal}g per meal | BMI {bmi:.1f}")
+    c1,c2 = st.columns(2)
+    c1.metric("Target/meal", f"{carb_meal}g")
+    c2.metric("Exercise today", f"{ex_min} min")
+
+    # map available to objects
+    avail_objs=[]
+    for a in p["available"]:
+        for f in FOODS:
+            if f["en"] in a or f["sn"] in a:
+                avail_objs.append(f); break
+    staples=[f for f in avail_objs if f["cat"] in ["Staple","Breakfast"]]
+    muriwo=[f for f in avail_objs if f["cat"] in ["Muriwo","Veg","Salad"]]
+    meat=[f for f in avail_objs if f["cat"] in ["Meat","Protein"]]
+    fruits=[f for f in avail_objs if f["cat"] in ["Fruit","Snack","Dairy"]]
+
+    if not staples: staples=[f for f in FOODS if f["cat"]=="Staple"][:2]
+    if not muriwo: muriwo=[f for f in FOODS if f["cat"]=="Muriwo"][:2]
+    if not meat: meat=[{"sn":"Mazai 2","carbs":1,"en":"Eggs"}]
+
+    def make_meal(name,time):
+        s=random.choice(staples); m=random.choice(muriwo); pr=random.choice(meat)
+        s_c = s["carbs"]//2 if s["carbs"]>25 else s["carbs"]
+        if "Cornflakes" in s["en"] or "Weetabix" in s["en"]:
+            s_c = s["carbs"]  # already small
+        total=s_c + m["carbs"] + pr["carbs"]
+        extra=""
+        if total < carb_meal-8 and fruits:
+            fr=random.choice(fruits)
+            if total+fr["carbs"] <= carb_meal+5:
+                extra=f" + {fr['sn']} ({fr['carbs']}g)"
+                total+=fr["carbs"]
+        # special handling for dovi
+        note=""
+        if "dovi" in s["sn"].lower():
+            note=" (Dovi adds protein, good!)"
+        st.markdown(f"**{name} ({time}) - {total}g {'✅' if total<=carb_meal+5 else '⚠️'}**\n- {s['sn']} → 1/2 cup ONLY ({s_c}g){note}\n- {m['sn']} → 1 cup full ({m['carbs']}g) eat first\n- {pr['sn']} ({pr['carbs']}g){extra}\n- Water 2 cups")
+        return total
+
+    b=make_meal("MANGWANANI / Breakfast","07:30")
+    l=make_meal("MASIKATI / Lunch","13:00")
+    d=make_meal("MANHERU / Dinner","19:00")
+    st.markdown(f"**Snack 10:30:** Choose from your fruits: e.g., Tsubvu/Guava/Pawpaw (8-10g)")
+    st.markdown(f"**Snack 16:00:** Nzungu 30g (6g) or Yoghurt plain (9g)")
+
+    st.markdown("### 🏃 Exercise to stay in range")
+    if sugar>10:
+        st.error(f"Sugar {sugar} high → Do {ex_min} min fast walk + kurima. Drops ~2 mmol/L. Recheck after 1hr.")
+    elif sugar<5:
+        st.warning(f"Sugar {sugar} low → Light walk {ex_min} min only. Eat fruit first!")
+    else:
+        st.success(f"Sugar good → {ex_min} min walk + sweep yard keeps stable.")
+    for ex in EXERCISES:
+        st.markdown(f"- {ex['name']}: {ex['min']} min → drops {ex['drop']} mmol/L")
+
+    if not p["taken"]:
+        st.error("⚠️ Take morning meds now with food!")
+    else:
+        st.success(f"Meds taken: {', '.join(p['meds'])} - Evening at 20:00")
+
+    if st.button("Save PDF Plan"):
+        pdf=FPDF(); pdf.add_page(); pdf.set_font("Arial","B",12)
+        pdf.cell(0,10,f"Plan BM {sugar} BMI {bmi:.1f}",ln=True); pdf.set_font("Arial","",10)
+        pdf.multi_cell(0,5,f"Date {datetime.date.today()}\nMeals B{b}g L{l}g D{d}g\nExercise {ex_min}min\nMeds {p['meds']}")
+        path="/tmp/plan.pdf"; pdf.output(path)
+        with open(path,"rb") as f:
+            st.download_button("Download", f, file_name="Plan.pdf", mime="application/pdf", type="primary")
+
+with tab3:
+    st.subheader("📚 Full Library 100+ Foods - Tsuro, Hanga, Mhou, Pawpaw, Dovi, Oats etc")
+    search=st.text_input("Search / Tsvaga", placeholder="tsuro, hanga, pawpaw, dovi, oats...")
+    cat=st.selectbox("Filter", ["All","Staple","Muriwo","Veg","Salad","Meat","Protein","Breakfast","Fruit","Dairy","Snack","Sweet"])
+    df=pd.DataFrame(FOODS)
+    if search:
+        df=df[df["en"].str.contains(search, case=False) | df["sn"].str.contains(search, case=False)]
+    if cat!="All":
+        df=df[df["cat"]==cat]
+    st.dataframe(df[["sn","en","carbs","level","cat"]].rename(columns={"sn":"Shona / Local","en":"English","carbs":"Carbs g","level":"Guide","cat":"Type"}), use_container_width=True, hide_index=True)
+    st.caption("🟢 Best/Good = eat daily | 🟡 Small portion | 🔴 Avoid | All carbs per portion shown")

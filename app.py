@@ -208,15 +208,39 @@ with tabs[9]:
     st.subheader("⏰ Reminders - Offline"); r1=st.time_input("BM Morning", datetime.time(7,0)); r2=st.time_input("Meds Morning", datetime.time(8,0)); st.info(f"Alarms: {r1} BM, {r2} Meds - set in phone clock works offline")
 
 with tabs[10]:
-    st.subheader("🔊 Voice for Gogo")
-    voice_sn="Mauya Gogo. Mangwanani idya sadza rezviyo hafu kapu ne mowa ne mazai. Tarisa shuga na seven. Tora mishonga na eight. Famba maminetsi makumi maviri."
-    lang_v=st.selectbox("Language", ["Shona","Ndebele","English"])
-    st.text_area(f"Voice {lang_v}", voice_sn)
+    st.subheader("🔊 Voice for Gogo - Can't read / Visually impaired")
+    # NEW VOICE AS YOU ASKED - EXACT WORDS
+    voice_sn_new = "Mangwanani. Usati wadya, geza maoko ako nesipo woaomesa. Chicheka shuga yako mangwanani uye manheru. Tora mishonga sekureva kwaChiremba wako. Wana nguva yekufamba kwemaminetsi makumi maviri mushure mekunge wapedza maminetsi makumi matatu wapedza kudya. Inwa mvura yakawanda muswere wezuva."
+
+    voice_nd_new = "Sawubona Gogo. Ngaphambi kokudla, geza izandla zakho ngensipho uzomise. Hlola ushukela wakho ekuseni nantambama. Thatha imithi njengokusho kukaDokotela wakho. Thola isikhathi sokuhamba imizuzu engamatshumi amabili ngemva kwemizuzu engamatshumi amathathu uqedile ukudla. Natha amanzi amaningi emini."
+
+    voice_en_new = "Good morning. Before you eat, wash your hands with soap and dry them. Check your sugar in the morning and evening. Take your medicine as your doctor said. Find time to walk for twenty minutes after thirty minutes of finishing eating. Drink plenty water during the day."
+
+    lang_v = st.selectbox("Language / Mutauro / Ulimi", ["Shona","Ndebele","English"], key="voice_lang_new")
+    txt_map = {"Shona": voice_sn_new, "Ndebele": voice_nd_new, "English": voice_en_new}
+    txt = txt_map[lang_v]
+
+    st.text_area(f"Voice in {lang_v} - Gogo will hear this", txt, height=140)
+
     if VOICE_OK:
-        if st.button(f"🔊 PLAY {lang_v}", type="primary", use_container_width=True):
+        if st.button(f"🔊 PLAY Voice for Gogo in {lang_v}", type="primary", use_container_width=True):
             try:
-                tts=gTTS(text=voice_sn, lang='en'); path="/tmp/gogo.mp3"; tts.save(path); st.audio(path)
-            except Exception as e: st.error(str(e))
+                # Use Shona text, gTTS will read it - understandable for Gogo
+                tts = gTTS(text=txt, lang='en') # en reads Shona words clearly, sn not supported by Google but en works
+                path = "/tmp/gogo_new.mp3"
+                tts.save(path)
+                st.audio(path, format="audio/mp3")
+                st.success(f"🔊 Playing in {lang_v} for Gogo")
+            except Exception as e:
+                st.error(f"Voice error: {e} - Family can read text aloud")
+    else:
+        st.warning("Add gtts to requirements.txt: gtts")
+        st.info("Text above can be read aloud by family for Gogo")
+
+    st.markdown("---")
+    st.caption("Tip: Tap PLAY loud on speaker for Gogo daily at 07:00 before breakfast.")
+    if st.button("📲 Send this NEW Voice Text to Family WhatsApp", key="send_voice_new"):
+        st.link_button("Send via WhatsApp", f"https://wa.me/?text={txt}")
 
 with tabs[11]:
     st.subheader("⚠️ Signs & Diagnosis + When to Seek Help")

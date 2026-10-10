@@ -209,6 +209,15 @@ with tabs[9]:
 
 with tabs[10]:
     st.subheader("🔊 Voice for Gogo - Can't read / Visually impaired")
+    # --- GOGO'S REAL VOICE - CHECK FIRST ---
+    import os
+    REAL_VOICE = "gogo_shona_real.aac"
+    if os.path.exists(REAL_VOICE):
+        st.success("✅ Gogo's REAL voice is READY - 26 sec")
+        st.audio(REAL_VOICE, format="audio/aac")
+        st.caption("🎙️ Playing Gogo's real uploaded voice, not robot")
+    else:
+        st.warning(f"Real voice '{REAL_VOICE}' not found. Files: {os.listdir('.')}")
     # NEW VOICE AS YOU ASKED - EXACT WORDS
     voice_sn_new = "Mangwanani. Usati wadya, geza maoko ako nesipo woaomesa. Chicheka shuga yako mangwanani uye manheru. Tora mishonga sekureva kwaChiremba wako. Wana nguva yekufamba kwemaminetsi makumi maviri mushure mekunge wapedza maminetsi makumi matatu wapedza kudya. Inwa mvura yakawanda muswere wezuva."
 
